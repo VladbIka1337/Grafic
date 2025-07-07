@@ -230,11 +230,8 @@
             </select>
         </div>
 
-        <div class="navigation-buttons flex justify-between items-center mb-6">
-            <button id="prev-month" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400">&lt; Назад</button>
-            <h2 id="current-month-year" class="text-xl md:text-2xl font-bold text-gray-700 text-center flex-grow mx-2"></h2>
-            <button id="today-button" class="px-4 py-2 bg-gray-400 text-white rounded-lg shadow hover:bg-gray-500 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 mr-2">Сегодня</button>
-            <button id="next-month" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400">Вперед &gt;</button>
+        <div class="navigation-buttons flex justify-center items-center mb-6">
+            <h2 id="current-month-year" class="text-xl md:text-2xl font-bold text-gray-700 text-center"></h2>
         </div>
 
         <div class="legend flex flex-wrap justify-center mb-8 p-4 bg-gray-50 rounded-lg shadow-inner">
@@ -269,38 +266,38 @@
             const calendarEl = document.getElementById('calendar');
             const userPairSelect = document.getElementById('user-pair-select');
             const currentMonthYearEl = document.getElementById('current-month-year');
-            const prevMonthBtn = document.getElementById('prev-month');
-            const nextMonthBtn = document.getElementById('next-month');
-            const todayButton = document.getElementById('today-button');
+            // Кнопки навигации по месяцам удалены, так как календарь начинается с сегодняшнего дня
+            // const prevMonthBtn = document.getElementById('prev-month');
+            // const nextMonthBtn = document.getElementById('next-month');
+            // const todayButton = document.getElementById('today-button');
 
-            // Текущая дата будет использоваться как точка отсчета для "сегодня".
+            // Текущая дата будет использоваться как точка отсчета.
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Обнуляем время для корректного сравнения дат
 
-            // Дата, отображаемая в календаре (изначально текущий месяц)
-            let currentDisplayDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            // Количество дней, которые нужно отобразить, начиная с сегодняшнего
+            const NUMBER_OF_DAYS_TO_DISPLAY = 45;
 
             // Определение графиков и начальных точек для каждого пользователя
-            // !!! ВНИМАНИЕ: referenceIndex должен быть установлен относительно today (сегодняшнего дня).
-            // Например, если сегодня 7 июля 2025 (вторник), и для "Господина" это 3-й выходной в цикле,
-            // то referenceIndex должен быть 7 (индекс 7 в массиве ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В']).
+            // !!! ВНИМАНИЕ: referenceDate и referenceIndex должны быть корректно настроены
+            // относительно *сегодняшней даты* для каждого пользователя.
             const people = {
                 "gospodin": {
                     name: "Господин",
                     scheduleCycle: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'], // 8-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // 7 июля 2025 года
+                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
                     referenceIndex: 7 // Сегодня 3-й выходной (индекс 7, если цикл от 0 до 7)
                 },
                 "pivnoyKorol": {
                     name: "Пивной король",
                     scheduleCycle: ['Д', 'Д', 'В', 'В'], // 4-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // 7 июля 2025 года
+                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
                     referenceIndex: 0 // Сегодня первая дневная смена
                 },
                 "chechevichnyyUzurpator": {
                     name: "Чечевичный узурпатор",
                     scheduleCycle: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'], // 8-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // 7 июля 2025 года
+                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
                     referenceIndex: 1 // Сегодня вторая дневная смена
                 }
             };
@@ -323,11 +320,10 @@
             };
 
             /**
-             * Рендерит календарь для выбранной пары пользователей и заданного месяца.
+             * Рендерит календарь для выбранной пары пользователей, начиная с сегодняшнего дня.
              * @param {string} selectedPairValue - Значение из селектора (например, "gospodin-pivnoyKorol").
-             * @param {Date} displayDate - Дата, месяц и год которой должны быть отображены.
              */
-            const renderCalendar = (selectedPairValue, displayDate) => {
+            const renderCalendar = (selectedPairValue) => {
                 calendarEl.innerHTML = ''; // Очищаем календарь перед перерисовкой
 
                 // Разделяем значение на ID двух пользователей
@@ -335,23 +331,21 @@
                 const user1 = people[user1Id];
                 const user2 = people[user2Id];
 
-                // Обновляем заголовок с текущим месяцем и годом
-                currentMonthYearEl.textContent = displayDate.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
+                // Обновляем заголовок с текущим месяцем и годом (для информации, т.к. календарь динамический)
+                currentMonthYearEl.textContent = today.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
 
-                // Определяем первый и последний день отображаемого месяца
-                const firstDayOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth(), 1);
-                const lastDayOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth() + 1, 0);
+                // Генерируем дни, начиная с сегодняшнего дня
+                for (let i = 0; i < NUMBER_OF_DAYS_TO_DISPLAY; i++) {
+                    const currentDate = new Date(today); // Начинаем отсчет от сегодня
+                    currentDate.setDate(today.getDate() + i); // Добавляем дни
 
-                // Генерируем дни для текущего месяца
-                for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
-                    const currentDate = new Date(displayDate.getFullYear(), displayDate.getMonth(), i);
                     currentDate.setHours(0, 0, 0, 0); // Обнуляем время для корректного сравнения
 
                     const user1Shift = getShift(currentDate, user1.referenceDate, user1.scheduleCycle, user1.referenceIndex);
                     const user2Shift = getShift(currentDate, user2.referenceDate, user2.scheduleCycle, user2.referenceIndex);
 
                     const isCommonOff = (user1Shift === 'В' && user2Shift === 'В');
-                    // Проверяем, является ли текущий день "сегодня"
+                    // Проверяем, является ли текущий день "сегодня" (строго currentDate === today)
                     const isToday = currentDate.toDateString() === today.toDateString();
 
 
@@ -384,29 +378,11 @@
 
             // Обработчик события для селектора пары пользователей
             userPairSelect.addEventListener('change', (event) => {
-                renderCalendar(event.target.value, currentDisplayDate);
+                renderCalendar(event.target.value);
             });
 
-            // Обработчик для кнопки "Предыдущий месяц"
-            prevMonthBtn.addEventListener('click', () => {
-                currentDisplayDate.setMonth(currentDisplayDate.getMonth() - 1);
-                renderCalendar(userPairSelect.value, currentDisplayDate);
-            });
-
-            // Обработчик для кнопки "Следующий месяц"
-            nextMonthBtn.addEventListener('click', () => {
-                currentDisplayDate.setMonth(currentDisplayDate.getMonth() + 1);
-                renderCalendar(userPairSelect.value, currentDisplayDate);
-            });
-
-            // Обработчик для кнопки "Сегодня"
-            todayButton.addEventListener('click', () => {
-                currentDisplayDate = new Date(today.getFullYear(), today.getMonth(), 1);
-                renderCalendar(userPairSelect.value, currentDisplayDate);
-            });
-
-            // Изначально рендерим календарь для первой пары в списке и текущего месяца
-            renderCalendar(userPairSelect.value, currentDisplayDate);
+            // Изначально рендерим календарь для первой пары в списке, начиная с сегодняшнего дня
+            renderCalendar(userPairSelect.value);
         });
     </script>
 </body>
