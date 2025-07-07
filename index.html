@@ -1,14 +1,10 @@
-
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Календарь Смен</title>
-    <!-- Подключение Tailwind CSS для стилизации -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Подключение скрипта Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         /* Основные стили для body */
@@ -209,7 +205,6 @@
             Выберите двух пользователей, чтобы увидеть их общие выходные дни.
         </p>
 
-        <!-- Контейнер для выбора пары пользователей -->
         <div class="user-select-container">
             <label for="user-pair-select" class="block text-gray-700 text-lg font-semibold mb-2">Показать графики для:</label>
             <select id="user-pair-select" class="user-select">
@@ -239,8 +234,11 @@
         </div>
 
         <div id="calendar" class="calendar-grid">
-            <!-- Дни календаря будут сгенерированы здесь с помощью JavaScript -->
-        </div>
+            </div>
+    </div>
+
+    <div class="w-full flex justify-center mt-8">
+        <img src="https://i.imgur.com/Z2oqtsV.jpeg" alt="Искусство" class="max-w-xs rounded-lg shadow-md">
     </div>
 
     <script>
@@ -350,6 +348,3 @@
     </script>
 </body>
 </html>
-
-
-
