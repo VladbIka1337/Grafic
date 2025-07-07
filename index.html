@@ -13,8 +13,9 @@
             background-color: #eef2f5; /* Более светлый фон */
             color: #2d3748; /* Темно-серый текст */
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column; /* Изменено на column для вертикального расположения элементов */
+            justify-content: flex-start; /* Выравнивание по верху */
+            align-items: center; /* Центрирование содержимого по горизонтали */
             min-height: 100vh;
             padding: 16px; /* Чуть меньше отступов */
             box-sizing: border-box;
@@ -29,6 +30,9 @@
             max-width: 95%; /* Чуть шире на больших экранах */
             width: 100%;
             overflow-x: auto;
+            /* Добавлено, чтобы календарь не конфликтовал с изображением */
+            position: relative; /* Убедимся, что он позиционируется нормально */
+            z-index: 10; /* Дадим ему z-index выше, чем у возможного фона */
         }
         /* Заголовок */
         h1 {
@@ -154,6 +158,25 @@
             margin-right: 10px;
         }
 
+        /* Стили для контейнера изображения */
+        .image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 32px; /* Увеличен отступ сверху */
+            position: relative; /* Добавлено для уверенности, что оно в потоке */
+            z-index: 1; /* Убедимся, что оно ниже календаря, если вдруг z-index есть у чего-то еще */
+        }
+        /* Стили для самого изображения */
+        .image-container img {
+            width: 100%; /* Занимает всю доступную ширину родителя */
+            max-width: 350px; /* Ограничиваем максимальную ширину */
+            height: auto; /* Сохраняем пропорции */
+            border-radius: 12px; /* Более скругленные углы */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Более выраженная тень */
+            display: block; /* Убираем лишние пробелы */
+        }
+
         /* Медиа-запросы для адаптивности на маленьких экранах */
         @media (max-width: 768px) {
             body {
@@ -194,6 +217,9 @@
             .legend-color {
                 width: 20px;
                 height: 20px;
+            }
+            .image-container img {
+                max-width: 250px; /* Уменьшаем на мобильных */
             }
         }
     </style>
@@ -237,8 +263,8 @@
             </div>
     </div>
 
-    <div class="w-full flex justify-center mt-8">
-        <img src="https://i.imgur.com/Z2oqtsV.jpeg" alt="Искусство" class="max-w-xs rounded-lg shadow-md">
+    <div class="image-container">
+        <img src="https://i.imgur.com/Z2oqtsV.jpeg" alt="Гинтама и Садахару">
     </div>
 
     <script>
