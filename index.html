@@ -1,10 +1,14 @@
+
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Календарь Смен</title>
+    <!-- Подключение Tailwind CSS для стилизации -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение скрипта Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         /* Основные стили для body */
@@ -14,7 +18,7 @@
             color: #2d3748; /* Темно-серый текст */
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Выравнивание по верху */
+            align-items: flex-start;
             min-height: 100vh;
             padding: 16px; /* Чуть меньше отступов */
             box-sizing: border-box;
@@ -28,7 +32,7 @@
             padding: 24px; /* Чуть меньше внутренних отступов */
             max-width: 95%; /* Чуть шире на больших экранах */
             width: 100%;
-            overflow-x: hidden; /* Скрыть горизонтальный скролл, если сетка адаптивна */
+            overflow-x: auto;
         }
         /* Заголовок */
         h1 {
@@ -136,13 +140,6 @@
             box-shadow: 0 6px 15px rgba(221, 107, 32, 0.3); /* Яркая тень */
             transform: scale(1.03); /* Меньше увеличение, чтобы не было слишком агрессивно */
         }
-        /* Стиль для сегодняшнего дня */
-        .calendar-day.today {
-            border: 2px solid #4299e1; /* Яркая синяя рамка */
-            box-shadow: 0 0 0 4px rgba(66, 153, 225, 0.4); /* Синее свечение */
-            background-color: #ebf8ff; /* Очень светлый голубой фон */
-        }
-
         /* Легенда */
         .legend {
             background-color: #f7fafc; /* Светлый фон легенды */
@@ -151,10 +148,6 @@
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Внутренняя тень */
         }
         .legend-item {
-            display: flex;
-            align-items: center;
-            margin-right: 15px; /* Отступ между элементами легенды */
-            margin-bottom: 8px; /* Отступ снизу для мобильных */
             font-size: 0.95em;
             color: #4a5568;
         }
@@ -206,11 +199,6 @@
                 width: 20px;
                 height: 20px;
             }
-            /* Стили для кнопок навигации на мобильных */
-            .navigation-buttons button {
-                padding: 8px 12px;
-                font-size: 0.9em;
-            }
         }
     </style>
 </head>
@@ -221,6 +209,7 @@
             Выберите двух пользователей, чтобы увидеть их общие выходные дни.
         </p>
 
+        <!-- Контейнер для выбора пары пользователей -->
         <div class="user-select-container">
             <label for="user-pair-select" class="block text-gray-700 text-lg font-semibold mb-2">Показать графики для:</label>
             <select id="user-pair-select" class="user-select">
@@ -228,10 +217,6 @@
                 <option value="gospodin-chechevichnyyUzurpator">Господин и Чечевичный узурпатор</option>
                 <option value="pivnoyKorol-chechevichnyyUzurpator">Пивной король и Чечевичный узурпатор</option>
             </select>
-        </div>
-
-        <div class="navigation-buttons flex justify-center items-center mb-6">
-            <h2 id="current-month-year" class="text-xl md:text-2xl font-bold text-gray-700 text-center"></h2>
         </div>
 
         <div class="legend flex flex-wrap justify-center mb-8 p-4 bg-gray-50 rounded-lg shadow-inner">
@@ -254,7 +239,8 @@
         </div>
 
         <div id="calendar" class="calendar-grid">
-            </div>
+            <!-- Дни календаря будут сгенерированы здесь с помощью JavaScript -->
+        </div>
     </div>
 
     <script>
@@ -265,39 +251,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             const calendarEl = document.getElementById('calendar');
             const userPairSelect = document.getElementById('user-pair-select');
-            const currentMonthYearEl = document.getElementById('current-month-year');
-            // Кнопки навигации по месяцам удалены, так как календарь начинается с сегодняшнего дня
-            // const prevMonthBtn = document.getElementById('prev-month');
-            // const nextMonthBtn = document.getElementById('next-month');
-            // const todayButton = document.getElementById('today-button');
 
             // Текущая дата будет использоваться как точка отсчета.
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Обнуляем время для корректного сравнения дат
-
-            // Количество дней, которые нужно отобразить, начиная с сегодняшнего
-            const NUMBER_OF_DAYS_TO_DISPLAY = 45;
+            today.setHours(0, 0, 0, 0);
 
             // Определение графиков и начальных точек для каждого пользователя
-            // !!! ВНИМАНИЕ: referenceDate и referenceIndex должны быть корректно настроены
-            // относительно *сегодняшней даты* для каждого пользователя.
             const people = {
                 "gospodin": {
                     name: "Господин",
                     scheduleCycle: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'], // 8-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
-                    referenceIndex: 7 // Сегодня 3-й выходной (индекс 7, если цикл от 0 до 7)
+                    referenceIndex: 7 // Сегодня 3-й выходной после ночных смен
                 },
                 "pivnoyKorol": {
                     name: "Пивной король",
                     scheduleCycle: ['Д', 'Д', 'В', 'В'], // 4-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
                     referenceIndex: 0 // Сегодня первая дневная смена
                 },
                 "chechevichnyyUzurpator": {
                     name: "Чечевичный узурпатор",
-                    scheduleCycle: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'], // 8-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
+                    scheduleCycle: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'], // 8-дневный цикл (как у Господина)
                     referenceIndex: 1 // Сегодня вторая дневная смена
                 }
             };
@@ -305,7 +278,7 @@
             /**
              * Вычисляет смену для заданной даты на основе опорной даты, цикла и опорного индекса.
              * @param {Date} currentDate - Дата, для которой нужно вычислить смену.
-             * @param {Date} referenceDate - Опорная дата для расчета смещения дней.
+             * @param {Date} referenceDate - Опорная дата (сегодня) для расчета смещения дней.
              * @param {Array<string>} cycle - Массив, представляющий цикл смен.
              * @param {number} referenceIndex - Индекс в цикле, который соответствует опорной дате.
              * @returns {string} Тип смены ('Д', 'Н', 'В').
@@ -314,13 +287,12 @@
                 const diffTime = currentDate.getTime() - referenceDate.getTime();
                 const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                 const cycleLength = cycle.length;
-                // Убедимся, что diffDays положителен для корректного вычисления по модулю
                 const cycleIndex = (referenceIndex + diffDays % cycleLength + cycleLength) % cycleLength;
                 return cycle[cycleIndex];
             };
 
             /**
-             * Рендерит календарь для выбранной пары пользователей, начиная с сегодняшнего дня.
+             * Рендерит календарь для выбранной пары пользователей.
              * @param {string} selectedPairValue - Значение из селектора (например, "gospodin-pivnoyKorol").
              */
             const renderCalendar = (selectedPairValue) => {
@@ -331,23 +303,17 @@
                 const user1 = people[user1Id];
                 const user2 = people[user2Id];
 
-                // Обновляем заголовок с текущим месяцем и годом (для информации, т.к. календарь динамический)
-                currentMonthYearEl.textContent = today.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
+                // Генерируем календарь на следующие 45 дней
+                const numberOfDaysToDisplay = 45;
 
-                // Генерируем дни, начиная с сегодняшнего дня
-                for (let i = 0; i < NUMBER_OF_DAYS_TO_DISPLAY; i++) {
-                    const currentDate = new Date(today); // Начинаем отсчет от сегодня
-                    currentDate.setDate(today.getDate() + i); // Добавляем дни
+                for (let i = 0; i < numberOfDaysToDisplay; i++) {
+                    const currentDate = new Date(today);
+                    currentDate.setDate(today.getDate() + i);
 
-                    currentDate.setHours(0, 0, 0, 0); // Обнуляем время для корректного сравнения
-
-                    const user1Shift = getShift(currentDate, user1.referenceDate, user1.scheduleCycle, user1.referenceIndex);
-                    const user2Shift = getShift(currentDate, user2.referenceDate, user2.scheduleCycle, user2.referenceIndex);
+                    const user1Shift = getShift(currentDate, today, user1.scheduleCycle, user1.referenceIndex);
+                    const user2Shift = getShift(currentDate, today, user2.scheduleCycle, user2.referenceIndex);
 
                     const isCommonOff = (user1Shift === 'В' && user2Shift === 'В');
-                    // Проверяем, является ли текущий день "сегодня" (строго currentDate === today)
-                    const isToday = currentDate.toDateString() === today.toDateString();
-
 
                     const dayOfWeek = currentDate.toLocaleString('ru-RU', { weekday: 'short' });
                     const dayOfMonth = currentDate.getDate();
@@ -357,9 +323,6 @@
                     dayElement.classList.add('calendar-day', 'rounded-xl');
                     if (isCommonOff) {
                         dayElement.classList.add('common-off');
-                    }
-                    if (isToday) {
-                        dayElement.classList.add('today');
                     }
 
                     dayElement.innerHTML = `
@@ -376,14 +339,17 @@
                 }
             };
 
-            // Обработчик события для селектора пары пользователей
+            // Устанавливаем обработчик события для селектора
             userPairSelect.addEventListener('change', (event) => {
                 renderCalendar(event.target.value);
             });
 
-            // Изначально рендерим календарь для первой пары в списке, начиная с сегодняшнего дня
+            // Изначально рендерим календарь для первой пары в списке
             renderCalendar(userPairSelect.value);
         });
     </script>
 </body>
 </html>
+
+
+
