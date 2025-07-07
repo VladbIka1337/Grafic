@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь Смен</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .calendar-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 90%;
+            width: 100%;
+            overflow-x: auto; /* Allow horizontal scrolling for smaller screens */
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(120px, 1fr)); /* Min width for cells */
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .calendar-header {
+            font-weight: bold;
+            text-align: center;
+            padding: 10px 0;
+            background-color: #e2e8f0;
+            border-radius: 8px;
+            color: #4a5568;
+        }
+        .calendar-day {
+            background-color: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px; /* Ensure consistent height */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .calendar-day:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .date {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+        .shift {
+            font-size: 0.9em;
+            padding: 4px 8px;
+            border-radius: 5px;
+            margin-top: 5px;
+            width: fit-content;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .shift-day { background-color: #4299e1; } /* Blue */
+        .shift-night { background-color: #805ad5; } /* Purple */
+        .shift-off { background-color: #48bb78; } /* Green */
+        .common-off {
+            background-color: #f6ad55; /* Orange */
+            border: 2px solid #ed8936;
+            transform: scale(1.05);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            margin-right: 8px;
+        }
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+            .calendar-day {
+                min-height: 100px;
+                padding: 10px;
+            }
+            .date {
+                font-size: 1em;
+            }
+            .shift {
+                font-size: 0.8em;
+                padding: 3px 6px;
+            }
+            .legend-item {
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+            .legend {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 sm:p-6 md:p-8">
+    <div class="calendar-container rounded-xl shadow-lg p-6 md:p-8 lg:p-10">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center mb-6 text-gray-800">Календарь Смен</h1>
+        <p class="text-lg text-center text-gray-600 mb-8">
+            Отслеживайте смены Господина и Кирилла, чтобы легко находить общие выходные дни.
+        </p>
+
+        <div class="legend flex flex-wrap justify-center mb-8 p-4 bg-gray-50 rounded-lg shadow-inner">
+            <div class="legend-item">
+                <div class="legend-color shift-day"></div>
+                <span>Д - Дневная смена</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color shift-night"></div>
+                <span>Н - Ночная смена</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color shift-off"></div>
+                <span>В - Выходной</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color common-off"></div>
+                <span>Общий выходной</span>
+            </div>
+        </div>
+
+        <div id="calendar" class="calendar-grid">
+            <!-- Calendar days will be generated here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendarEl = document.getElementById('calendar');
+
+            // Today's date is July 5, 2025, which is the reference point for both schedules.
+            const today = new Date('2025-07-05T00:00:00'); // Use a specific time to avoid timezone issues
+
+            // --- Господин's Schedule ---
+            // Schedule: 2 Day / 1 Off / 2 Night / 3 Off (8-day cycle)
+            // Today (July 5) is 1st day off after night shifts.
+            // Cycle: [Д, Д, В, Н, Н, В, В, В]
+            // Sequence: ..., Н, Н, В (today), В, В, Д, Д, ...
+            // So, 'В' (today) is at index 5 in this cycle.
+            const gospodinScheduleCycle = ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'];
+            const gospodinReferenceIndex = 5; // Index of 'В' (first day off after night shifts) in the cycle
+
+            // --- Кирилл's Schedule ---
+            // Schedule: 2 Day / 2 Off (4-day cycle)
+            // Today (July 5) is 1st day off after day shifts.
+            // Cycle: [Д, Д, В, В]
+            // Sequence: ..., Д, Д, В (today), В, ...
+            // So, 'В' (today) is at index 2 in this cycle.
+            const kirillScheduleCycle = ['Д', 'Д', 'В', 'В'];
+            const kirillReferenceIndex = 2; // Index of 'В' (first day off after day shifts) in the cycle
+
+            /**
+             * Calculates the shift for a given date based on a reference date, cycle, and reference index.
+             * @param {Date} currentDate - The date for which to calculate the shift.
+             * @param {Date} referenceDate - The starting date (today) for calculating day offset.
+             * @param {Array<string>} cycle - The array representing the shift cycle.
+             * @param {number} referenceIndex - The index in the cycle that corresponds to the referenceDate.
+             * @returns {string} The shift type ('Д', 'Н', 'В').
+             */
+            const getShift = (currentDate, referenceDate, cycle, referenceIndex) => {
+                // Calculate the difference in days from the reference date
+                const diffTime = currentDate.getTime() - referenceDate.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                // Calculate the actual index in the cycle
+                const cycleLength = cycle.length;
+                const cycleIndex = (referenceIndex + diffDays % cycleLength + cycleLength) % cycleLength;
+                return cycle[cycleIndex];
+            };
+
+            // Generate calendar for the next 45 days (approx. 6 weeks)
+            const numberOfDaysToDisplay = 45;
+
+            for (let i = 0; i < numberOfDaysToDisplay; i++) {
+                const currentDate = new Date(today);
+                currentDate.setDate(today.getDate() + i);
+
+                const gospodinShift = getShift(currentDate, today, gospodinScheduleCycle, gospodinReferenceIndex);
+                const kirillShift = getShift(currentDate, today, kirillScheduleCycle, kirillReferenceIndex);
+
+                const isCommonOff = (gospodinShift === 'В' && kirillShift === 'В');
+
+                const dayOfWeek = currentDate.toLocaleString('ru-RU', { weekday: 'short' });
+                const dayOfMonth = currentDate.getDate();
+                const month = currentDate.toLocaleString('ru-RU', { month: 'short' });
+
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day', 'rounded-xl');
+                if (isCommonOff) {
+                    dayElement.classList.add('common-off');
+                }
+
+                dayElement.innerHTML = `
+                    <div class="date text-gray-800">${dayOfMonth} ${month}</div>
+                    <div class="text-sm text-gray-500 mb-2">${dayOfWeek}</div>
+                    <div class="shift ${gospodinShift === 'Д' ? 'shift-day' : gospodinShift === 'Н' ? 'shift-night' : 'shift-off'}">
+                        Господин: ${gospodinShift}
+                    </div>
+                    <div class="shift ${kirillShift === 'Д' ? 'shift-day' : kirillShift === 'Н' ? 'shift-night' : 'shift-off'}">
+                        Кирилл: ${kirillShift}
+                    </div>
+                `;
+                calendarEl.appendChild(dayElement);
+            }
+        });
+    </script>
+</body>
+</html>
+
+
