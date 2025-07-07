@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Календарь Смен</title>
+    <!-- Подключение Tailwind CSS для стилизации -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение скрипта Telegram WebApp API -->
+    <!-- Этот скрипт позволяет вашему веб-приложению взаимодействовать с Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Основные стили для body */
+        body {
+            font-family: 'Inter', sans-serif; /* Использование шрифта Inter */
+            background-color: #f0f2f5; /* Светло-серый фон */
+            color: #333; /* Темный цвет текста */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Выравнивание по верху */
+            min-height: 100vh; /* Минимальная высота на весь экран */
+            padding: 20px; /* Отступы вокруг содержимого */
+            box-sizing: border-box; /* Учет padding в ширине/высоте */
+            margin: 0; /* Убираем стандартные отступы body */
+        }
+        /* Контейнер календаря */
+        .calendar-container {
+            background-color: #ffffff; /* Белый фон */
+            border-radius: 15px; /* Скругленные углы */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Тень */
+            padding: 30px; /* Внутренние отступы */
+            max-width: 90%; /* Максимальная ширина */
+            width: 100%; /* Ширина 100% от родителя */
+            overflow-x: auto; /* Горизонтальный скролл для маленьких экранов */
+        }
+        /* Сетка календаря */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(120px, 1fr)); /* 7 колонок, минимальная ширина ячейки 120px */
+            gap: 10px; /* Отступы между ячейками */
+            margin-top: 20px; /* Отступ сверху */
+        }
+        /* Заголовок календаря (дни недели) - не используется в текущей реализации, но оставлен для примера */
+        .calendar-header {
+            font-weight: bold;
+            text-align: center;
+            padding: 10px 0;
+            background-color: #e2e8f0;
+            border-radius: 8px;
+            color: #4a5568;
+        }
+        /* Ячейка дня календаря */
+        .calendar-day {
+            background-color: #f7fafc; /* Очень светло-серый фон */
+            border-radius: 10px; /* Скругленные углы */
+            padding: 15px; /* Внутренние отступы */
+            display: flex;
+            flex-direction: column; /* Элементы в колонку */
+            align-items: center; /* Центрирование по горизонтали */
+            justify-content: center; /* Центрирование по вертикали */
+            min-height: 120px; /* Минимальная высота для единообразия */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Легкая тень */
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Анимация при наведении */
+        }
+        /* Эффект при наведении на ячейку дня */
+        .calendar-day:hover {
+            transform: translateY(-3px); /* Сдвиг вверх */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Усиление тени */
+        }
+        /* Стиль для даты в ячейке */
+        .date {
+            font-size: 1.2em; /* Увеличенный размер шрифта */
+            font-weight: bold; /* Жирный шрифт */
+            margin-bottom: 8px; /* Отступ снизу */
+            color: #2d3748; /* Темно-серый цвет */
+        }
+        /* Стиль для обозначения смены */
+        .shift {
+            font-size: 0.9em; /* Размер шрифта */
+            padding: 4px 8px; /* Внутренние отступы */
+            border-radius: 5px; /* Скругленные углы */
+            margin-top: 5px; /* Отступ сверху */
+            width: fit-content; /* Ширина по содержимому */
+            text-align: center; /* Центрирование текста */
+            color: white; /* Белый текст */
+            font-weight: 600; /* Полужирный шрифт */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Легкая тень */
+        }
+        /* Цвета для разных типов смен */
+        .shift-day { background-color: #4299e1; } /* Синий для дневной */
+        .shift-night { background-color: #805ad5; } /* Фиолетовый для ночной */
+        .shift-off { background-color: #48bb78; } /* Зеленый для выходного */
+        /* Стиль для общего выходного дня */
+        .common-off {
+            background-color: #f6ad55; /* Оранжевый фон */
+            border: 2px solid #ed8936; /* Оранжевая рамка */
+            transform: scale(1.05); /* Немного увеличиваем */
+        }
+        /* Элемент легенды */
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        /* Цветовой блок в легенде */
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            margin-right: 8px;
+        }
+        /* Медиа-запросы для адаптивности на маленьких экранах */
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Адаптивные колонки */
+            }
+            .calendar-day {
+                min-height: 100px;
+                padding: 10px;
+            }
+            .date {
+                font-size: 1em;
+            }
+            .shift {
+                font-size: 0.8em;
+                padding: 3px 6px;
+            }
+            .legend-item {
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+            .legend {
+                flex-wrap: wrap; /* Перенос элементов легенды */
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 sm:p-6 md:p-8">
+    <div class="calendar-container rounded-xl shadow-lg p-6 md:p-8 lg:p-10">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center mb-6 text-gray-800">Календарь Смен</h1>
+        <p class="text-lg text-center text-gray-600 mb-8">
+            Отслеживайте смены Господина и Кирилла, чтобы легко находить общие выходные дни.
+        </p>
+
+        <div class="legend flex flex-wrap justify-center mb-8 p-4 bg-gray-50 rounded-lg shadow-inner">
+            <div class="legend-item">
+                <div class="legend-color shift-day"></div>
+                <span>Д - Дневная смена</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color shift-night"></div>
+                <span>Н - Ночная смена</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color shift-off"></div>
+                <span>В - Выходной</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color common-off"></div>
+                <span>Общий выходной</span>
+            </div>
+        </div>
+
+        <div id="calendar" class="calendar-grid">
+            <!-- Дни календаря будут сгенерированы здесь с помощью JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        // Этот метод сообщает Telegram, что ваше веб-приложение готово к отображению.
+        Telegram.WebApp.ready();
+        // Этот метод заставляет веб-приложение развернуться на весь экран.
+        Telegram.WebApp.expand();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendarEl = document.getElementById('calendar');
+
+            // Текущая дата будет использоваться как точка отсчета.
+            // Примечание: new Date() создает объект даты для текущего момента времени.
+            const today = new Date();
+            // Обнуляем время, чтобы расчеты велись только по дням
+            today.setHours(0, 0, 0, 0);
+
+            // --- График Господина ---
+            // График: 2 день / 1 выходной / 2 ночь / 3 выходных (8-дневный цикл)
+            // Цикл: [Д, Д, В, Н, Н, В, В, В]
+            // Условие: "Сегодня первый выходной после ночных смен."
+            // В цикле: ..., Н (индекс 4), Н (индекс 5), В (индекс 6 - это первый выходной после ночных), В (индекс 7), В (индекс 0), Д (индекс 1), Д (индекс 2), В (индекс 3), Н (индекс 4), Н (индекс 5), В (индекс 6) ...
+            // Если "Сегодня первый выходной после ночных смен", то в цикле [Д, Д, В, Н, Н, В, В, В] это будет 'В' на индексе 5.
+            // Пример: ...Н(4), Н(5), В(6), В(7), В(0), Д(1), Д(2), В(3)...
+            // Если сегодня 'В' на индексе 5, то предыдущие дни были 'Н' на индексе 4 и 'Н' на индексе 3.
+            // Корректный цикл: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В']
+            // Позиция: Н(индекс 3), Н(индекс 4), В(индекс 5 - это первый выходной после ночных)
+            const gospodinScheduleCycle = ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'];
+            const gospodinReferenceIndex = 5; // Индекс 'В' (первый выходной после ночных смен) в цикле
+
+            // --- График Кирилла ---
+            // График: 2 день / 2 выходных (4-дневный цикл)
+            // Цикл: [Д, Д, В, В]
+            // Условие: "Сегодня первый выходной после дневных смен."
+            // В цикле: ..., Д (индекс 0), Д (индекс 1), В (индекс 2 - это первый выходной после дневных), В (индекс 3), ...
+            const kirillScheduleCycle = ['Д', 'Д', 'В', 'В'];
+            const kirillReferenceIndex = 2; // Индекс 'В' (первый выходной после дневных смен) в цикле
+
+            /**
+             * Вычисляет смену для заданной даты на основе опорной даты, цикла и опорного индекса.
+             * @param {Date} currentDate - Дата, для которой нужно вычислить смену.
+             * @param {Date} referenceDate - Опорная дата (сегодня) для расчета смещения дней.
+             * @param {Array<string>} cycle - Массив, представляющий цикл смен.
+             * @param {number} referenceIndex - Индекс в цикле, который соответствует опорной дате.
+             * @returns {string} Тип смены ('Д', 'Н', 'В').
+             */
+            const getShift = (currentDate, referenceDate, cycle, referenceIndex) => {
+                // Вычисляем разницу в днях от опорной даты
+                const diffTime = currentDate.getTime() - referenceDate.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Используем floor для положительной разницы
+
+                // Вычисляем фактический индекс в цикле
+                const cycleLength = cycle.length;
+                // Модуль по длине цикла, чтобы оставаться в пределах цикла
+                // Добавляем cycleLength перед % cycleLength, чтобы избежать отрицательных результатов при отрицательном diffDays
+                const cycleIndex = (referenceIndex + diffDays % cycleLength + cycleLength) % cycleLength;
+                return cycle[cycleIndex];
+            };
+
+            // Генерируем календарь на следующие 45 дней (примерно 6 недель)
+            const numberOfDaysToDisplay = 45;
+
+            for (let i = 0; i < numberOfDaysToDisplay; i++) {
+                const currentDate = new Date(today);
+                currentDate.setDate(today.getDate() + i); // Устанавливаем дату для текущего дня в цикле
+
+                // Получаем смены для Господина и Кирилла
+                const gospodinShift = getShift(currentDate, today, gospodinScheduleCycle, gospodinReferenceIndex);
+                const kirillShift = getShift(currentDate, today, kirillScheduleCycle, kirillReferenceIndex);
+
+                // Проверяем, является ли день общим выходным
+                const isCommonOff = (gospodinShift === 'В' && kirillShift === 'В');
+
+                // Форматируем дату для отображения
+                const dayOfWeek = currentDate.toLocaleString('ru-RU', { weekday: 'short' });
+                const dayOfMonth = currentDate.getDate();
+                const month = currentDate.toLocaleString('ru-RU', { month: 'short' });
+
+                // Создаем элемент дня календаря
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day', 'rounded-xl');
+                if (isCommonOff) {
+                    dayElement.classList.add('common-off'); // Добавляем класс для общего выходного
+                }
+
+                // Вставляем HTML-содержимое для дня
+                dayElement.innerHTML = `
+                    <div class="date text-gray-800">${dayOfMonth} ${month}</div>
+                    <div class="text-sm text-gray-500 mb-2">${dayOfWeek}</div>
+                    <div class="shift ${gospodinShift === 'Д' ? 'shift-day' : gospodinShift === 'Н' ? 'shift-night' : 'shift-off'}">
+                        Господин: ${gospodinShift}
+                    </div>
+                    <div class="shift ${kirillShift === 'Д' ? 'shift-day' : kirillShift === 'Н' ? 'shift-night' : 'shift-off'}">
+                        Кирилл: ${kirillShift}
+                    </div>
+                `;
+                calendarEl.appendChild(dayElement); // Добавляем день в календарь
+            }
+        });
+    </script>
+</body>
+</html>
+
