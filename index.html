@@ -13,8 +13,9 @@
             background-color: #eef2f5; /* Более светлый фон */
             color: #2d3748; /* Темно-серый текст */
             display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Выравнивание по верху */
+            flex-direction: column; /* Изменено на column для вертикального расположения элементов */
+            justify-content: flex-start; /* Выравнивание по верху */
+            align-items: center; /* Центрирование содержимого по горизонтали */
             min-height: 100vh;
             padding: 16px; /* Чуть меньше отступов */
             box-sizing: border-box;
@@ -29,6 +30,8 @@
             max-width: 95%; /* Чуть шире на больших экранах */
             width: 100%;
             overflow-x: hidden; /* Скрыть горизонтальный скролл, если сетка адаптивна */
+            position: relative; /* Убедимся, что он позиционируется нормально */
+            z-index: 10; /* Дадим ему z-index выше, чем у возможного фона */
         }
         /* Заголовок */
         h1 {
@@ -165,6 +168,25 @@
             margin-right: 10px;
         }
 
+        /* Стили для контейнера изображения */
+        .image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 32px; /* Увеличен отступ сверху */
+            position: relative; /* Добавлено для уверенности, что оно в потоке */
+            z-index: 1; /* Убедимся, что оно ниже календаря, если вдруг z-index есть у чего-то еще */
+        }
+        /* Стили для самого изображения */
+        .image-container img {
+            width: 100%; /* Занимает всю доступную ширину родителя */
+            max-width: 350px; /* Ограничиваем максимальную ширину */
+            height: auto; /* Сохраняем пропорции */
+            border-radius: 12px; /* Более скругленные углы */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Более выраженная тень */
+            display: block; /* Убираем лишние пробелы */
+        }
+
         /* Медиа-запросы для адаптивности на маленьких экранах */
         @media (max-width: 768px) {
             body {
@@ -211,6 +233,9 @@
                 padding: 8px 12px;
                 font-size: 0.9em;
             }
+            .image-container img {
+                max-width: 250px; /* Уменьшаем на мобильных */
+            }
         }
     </style>
 </head>
@@ -225,8 +250,8 @@
             <label for="user-pair-select" class="block text-gray-700 text-lg font-semibold mb-2">Показать графики для:</label>
             <select id="user-pair-select" class="user-select">
                 <option value="gospodin-pivnoyKorol">Господин и Пивной король</option>
-                <option value="gospodin-chechevichnyyUzurpator">Господин и Чечевичный узурпатор</option>
-                <option value="pivnoyKorol-chechevichnyyUzurpator">Пивной король и Чечевичный узурпатор</option>
+                <option value="gospodin-chechevichnyyUzurpator">Господин и Набирал гамма</option>
+                <option value="pivnoyKorol-chechevichnyyUzurpator">Пивной король и Набирал гамма</option>
             </select>
         </div>
 
@@ -257,6 +282,10 @@
             </div>
     </div>
 
+    <div class="image-container">
+        <img src="https://i.imgur.com/Z2oqtsV.jpeg" alt="Гинтама и Садахару">
+    </div>
+
     <script>
         // Инициализация Telegram WebApp
         Telegram.WebApp.ready();
@@ -266,11 +295,7 @@
             const calendarEl = document.getElementById('calendar');
             const userPairSelect = document.getElementById('user-pair-select');
             const currentMonthYearEl = document.getElementById('current-month-year');
-            // Кнопки навигации по месяцам удалены, так как календарь начинается с сегодняшнего дня
-            // const prevMonthBtn = document.getElementById('prev-month');
-            // const nextMonthBtn = document.getElementById('next-month');
-            // const todayButton = document.getElementById('today-button');
-
+            
             // Текущая дата будет использоваться как точка отсчета.
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Обнуляем время для корректного сравнения дат
@@ -294,8 +319,8 @@
                     referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
                     referenceIndex: 0 // Сегодня первая дневная смена
                 },
-                "chechevichnyyUzurpator": {
-                    name: "Чечевичный узурпатор",
+                "chechevichnyyUzurpator": { // ID остается прежним для логики
+                    name: "Набирал гамма", // Имя изменено
                     scheduleCycle: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'], // 8-дневный цикл
                     referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
                     referenceIndex: 1 // Сегодня вторая дневная смена
