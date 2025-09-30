@@ -30,8 +30,8 @@
             max-width: 95%; /* Чуть шире на больших экранах */
             width: 100%;
             overflow-x: hidden; /* Скрыть горизонтальный скролл, если сетка адаптивна */
-            position: relative; /* Убедимся, что он позиционируется нормально */
-            z-index: 10; /* Дадим ему z-index выше, чем у возможного фона */
+            position: relative; 
+            z-index: 10; 
         }
         /* Заголовок */
         h1 {
@@ -57,7 +57,7 @@
             background-color: #f7fafc;
             font-size: 1.1em;
             color: #2d3748;
-            appearance: none; /* Убирает стандартные стили селектора */
+            appearance: none; 
             -webkit-appearance: none;
             -moz-appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E"); /* Кастомная стрелка */
@@ -92,20 +92,20 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 150px; /* Увеличена высота для 3х обозначений смен */
+            min-height: 150px; 
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Мягкая тень */
             transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
             border: 1px solid #e2e8f0; /* Легкая рамка */
         }
         /* Эффект при наведении на ячейку дня */
         .calendar-day:hover {
-            transform: translateY(-5px); /* Больший сдвиг вверх */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Усиление тени */
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
         }
         /* Стиль для даты в ячейке */
         .date {
-            font-size: 1.3em; /* Крупнее дата */
-            font-weight: 700; /* Более жирный */
+            font-size: 1.3em; 
+            font-weight: 700; 
             margin-bottom: 6px;
             color: #2c5282; /* Темно-синий */
         }
@@ -117,16 +117,16 @@
         }
         /* Стиль для обозначения смены */
         .shift {
-            font-size: 0.9em; /* Чуть крупнее */
-            padding: 6px 10px; /* Больше отступов */
-            border-radius: 8px; /* Более скругленные */
-            margin-top: 4px; /* Отступ сверху */
-            width: 100%; /* Занимает всю ширину */
+            font-size: 0.9em; 
+            padding: 6px 10px; 
+            border-radius: 8px; 
+            margin-top: 4px; 
+            width: 100%; 
             text-align: center;
             color: white;
             font-weight: 600;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-            letter-spacing: 0.02em; /* Небольшой межбуквенный интервал */
+            letter-spacing: 0.02em; 
         }
         /* Цвета для разных типов смен */
         .shift-day { background-color: #3182ce; } /* Ярче синий */
@@ -137,7 +137,7 @@
             background-color: #fbd38d; /* Светло-оранжевый фон */
             border: 2px solid #dd6b20; /* Темно-оранжевая рамка */
             box-shadow: 0 6px 15px rgba(221, 107, 32, 0.3); /* Яркая тень */
-            transform: scale(1.03); /* Меньше увеличение, чтобы не было слишком агрессивно */
+            transform: scale(1.03); 
         }
         /* Стиль для сегодняшнего дня */
         .calendar-day.today {
@@ -148,23 +148,23 @@
 
         /* Легенда */
         .legend {
-            background-color: #f7fafc; /* Светлый фон легенды */
+            background-color: #f7fafc; 
             border-radius: 12px;
             padding: 16px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Внутренняя тень */
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); 
         }
         .legend-item {
             display: flex;
             align-items: center;
-            margin-right: 15px; /* Отступ между элементами легенды */
-            margin-bottom: 8px; /* Отступ снизу для мобильных */
+            margin-right: 15px; 
+            margin-bottom: 8px; 
             font-size: 0.95em;
             color: #4a5568;
         }
         .legend-color {
-            width: 24px; /* Чуть больше */
+            width: 24px; 
             height: 24px;
-            border-radius: 6px; /* Чуть больше скругление */
+            border-radius: 6px; 
             margin-right: 10px;
         }
 
@@ -173,18 +173,18 @@
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-top: 32px; /* Увеличен отступ сверху */
-            position: relative; /* Добавлено для уверенности, что оно в потоке */
-            z-index: 1; /* Убедимся, что оно ниже календаря, если вдруг z-index есть у чего-то еще */
+            margin-top: 32px; 
+            position: relative; 
+            z-index: 1; 
         }
         /* Стили для самого изображения */
         .image-container img {
-            width: 100%; /* Занимает всю доступную ширину родителя */
-            max-width: 350px; /* Ограничиваем максимальную ширину */
-            height: auto; /* Сохраняем пропорции */
-            border-radius: 12px; /* Более скругленные углы */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Более выраженная тень */
-            display: block; /* Убираем лишние пробелы */
+            width: 100%; 
+            max-width: 350px; 
+            height: auto; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+            display: block; 
         }
 
         /* Медиа-запросы для адаптивности на маленьких экранах */
@@ -203,11 +203,11 @@
                 font-size: 1em;
             }
             .calendar-grid {
-                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Еще меньше мин. ширина */
+                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
                 gap: 8px;
             }
             .calendar-day {
-                min-height: 130px; /* Адаптировано для мобильных, 3 смены */
+                min-height: 130px; 
                 padding: 12px;
                 border-radius: 12px;
             }
@@ -234,7 +234,7 @@
                 font-size: 0.9em;
             }
             .image-container img {
-                max-width: 250px; /* Уменьшаем на мобильных */
+                max-width: 250px; 
             }
         }
     </style>
@@ -304,37 +304,32 @@
             const NUMBER_OF_DAYS_TO_DISPLAY = 45;
 
             // Определение графиков и начальных точек для каждого пользователя
-            // !!! ВНИМАНИЕ: referenceDate и referenceIndex должны быть корректно настроены
-            // относительно *сегодняшней даты* для каждого пользователя.
             const people = {
                 "gospodin": {
                     name: "Господин",
-                    scheduleCycle: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'], // 8-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
-                    referenceIndex: 7 // Сегодня 3-й выходной (индекс 7, если цикл от 0 до 7)
+                    // График 2/2 ДЕНЬ: сегодня-завтра смена
+                    scheduleCycle: ['Д', 'Д', 'В', 'В'], // 4-дневный цикл
+                    referenceDate: today, // Начало цикла - сегодня
+                    referenceIndex: 0 // Начинается с 'Д'
                 },
                 "pivnoyKorol": {
                     name: "Пивной король",
+                    // Новый график 2/2 ДЕНЬ: сегодня смена, потом 2 выходных
                     scheduleCycle: ['Д', 'Д', 'В', 'В'], // 4-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
-                    referenceIndex: 0 // Сегодня первая дневная смена
+                    referenceDate: today, // Начало цикла - сегодня
+                    referenceIndex: 0 // Начинается с 'Д'
                 },
-                "chechevichnyyUzurpator": { // ID остается прежним для логики
-                    name: "Набирал гамма", // Имя изменено
-                    scheduleCycle: ['Д', 'Д', 'В', 'Н', 'Н', 'В', 'В', 'В'], // 8-дневный цикл
-                    referenceDate: new Date(2025, 6, 7), // Сегодня, 7 июля 2025 года
-                    referenceIndex: 1 // Сегодня вторая дневная смена
+                "chechevichnyyUzurpator": { 
+                    name: "Набирал гамма", 
+                    // График 2/2, начиная с выходного: сегодня-завтра выходной
+                    scheduleCycle: ['В', 'В', 'Д', 'Д'], // 4-дневный цикл
+                    referenceDate: today, // Начало цикла - сегодня
+                    referenceIndex: 0 // Начинается с 'В'
                 }
             };
 
             /**
              * Вычисляет смену для заданной даты на основе опорной даты, цикла и опорного индекса.
-             * @param {Date} currentDate - Дата, для которой нужно вычислить смену.
-             * @param {Date} referenceDate - Опорная дата для расчета смещения дней.
-             * @param {Array<string>} cycle - Массив, представляющий цикл смен.
-             * @param {number} referenceIndex - Индекс в цикле, который соответствует опорной дате.
-             * @param {string} userId - ID пользователя, для которого вычисляется смена.
-             * @returns {string} Тип смены ('Д', 'Н', 'В').
              */
             const getShift = (currentDate, referenceDate, cycle, referenceIndex, userId) => {
                 const diffTime = currentDate.getTime() - referenceDate.getTime();
@@ -342,21 +337,17 @@
                 const cycleLength = cycle.length;
                 // Убедимся, что diffDays положителен для корректного вычисления по модулю
                 const cycleIndex = (referenceIndex + diffDays % cycleLength + cycleLength) % cycleLength;
+                
+                // Для Пивного короля и Господина, shift всегда будет Д или В, так как цикл не содержит Н.
                 let shift = cycle[cycleIndex];
 
-                // Специальное условие для "Пивного короля": нет выходных до конца текущего месяца
-                // Текущая дата: 21 июля 2025 года
-                if (userId === "pivnoyKorol" && currentDate.getMonth() === 6 && currentDate.getFullYear() === 2025 && currentDate.getDate() >= 21) {
-                    if (shift === 'В') {
-                        shift = 'Д'; // Меняем выходной на дневную смену
-                    }
-                }
+                // ВАЖНО: Специальное условие для Пивного короля удалено.
+                
                 return shift;
             };
 
             /**
              * Рендерит календарь для выбранной пары пользователей, начиная с сегодняшнего дня.
-             * @param {string} selectedPairValue - Значение из селектора (например, "gospodin-pivnoyKorol").
              */
             const renderCalendar = (selectedPairValue) => {
                 calendarEl.innerHTML = ''; // Очищаем календарь перед перерисовкой
@@ -376,11 +367,12 @@
 
                     currentDate.setHours(0, 0, 0, 0); // Обнуляем время для корректного сравнения
 
+                    // Вызываем getShift с учетом ID пользователя для спец. условий
                     const user1Shift = getShift(currentDate, user1.referenceDate, user1.scheduleCycle, user1.referenceIndex, user1Id);
                     const user2Shift = getShift(currentDate, user2.referenceDate, user2.scheduleCycle, user2.referenceIndex, user2Id);
 
                     const isCommonOff = (user1Shift === 'В' && user2Shift === 'В');
-                    // Проверяем, является ли текущий день "сегодня" (строго currentDate === today)
+                    // Проверяем, является ли текущий день "сегодня"
                     const isToday = currentDate.toDateString() === today.toDateString();
 
 
