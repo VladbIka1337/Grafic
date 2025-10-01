@@ -307,24 +307,24 @@
             const people = {
                 "gospodin": {
                     name: "Господин",
-                    // График 2/2 ДЕНЬ: сегодня-завтра смена
+                    // График 2/2 ДЕНЬ: сегодня - 2-й рабочий день ('Д' - индекс 1)
                     scheduleCycle: ['Д', 'Д', 'В', 'В'], // 4-дневный цикл
-                    referenceDate: today, // Начало цикла - сегодня
-                    referenceIndex: 0 // Начинается с 'Д' (1-й день)
+                    referenceDate: today, 
+                    referenceIndex: 1 
                 },
                 "pivnoyKorol": {
                     name: "Пивной король",
-                    // График 2/2 ДЕНЬ: сегодня - второй рабочий день
+                    // График 2/2 ДЕНЬ: сегодня - 1-й выходной ('В' - индекс 2)
                     scheduleCycle: ['Д', 'Д', 'В', 'В'], // 4-дневный цикл
-                    referenceDate: today, // Начало отсчета - сегодня
-                    referenceIndex: 1 // Сдвигаем на 1, чтобы сегодня был 2-й 'Д'
+                    referenceDate: today, 
+                    referenceIndex: 2 
                 },
                 "chechevichnyyUzurpator": { 
                     name: "Набирал гамма", 
-                    // График 2/2, начиная с выходного: сегодня-завтра выходной
+                    // График 2/2, начиная с выходного: сегодня - 2-й выходной ('В' - индекс 1)
                     scheduleCycle: ['В', 'В', 'Д', 'Д'], // 4-дневный цикл
-                    referenceDate: today, // Начало цикла - сегодня
-                    referenceIndex: 0 // Начинается с 'В' (1-й день)
+                    referenceDate: today, 
+                    referenceIndex: 1 
                 }
             };
 
